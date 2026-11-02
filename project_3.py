@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import re
+from tabulate import tabulate
 
 URL= "https://books.toscrape.com/"
 header= {"User-Agent": "Rozie practice cot. contact: rozie@gmail.com"}
@@ -34,5 +35,18 @@ for card in cards:
     number = float(re.sub(r"[^\d.]", "", price))          # "£51.77" -> 51.77
     converted_price = round(number * rate, 2)                   # 51.77 * rate
     all_products.append({"title": title, "original_price": price,"converted_price":converted_price})
-    print(f"{title} | {price} -> {converted_price} {Target_currency}")
-    
+    #print(f"{title} | {price} -> {converted_price} {Target_currency}")
+
+rows = []
+for p in all_products:
+    short_title = p["title"] if len(p["title"]) <= 40 else p["title"][:37] + "..."
+    rows.append([short_title, p["original_price"], p["converted_price"]])
+ 
+print(
+    tabulate(
+        rows,
+        headers=["Title", "Price (GBP)", f"Price ({Target_currency})"],
+        tablefmt="simple",
+        showindex=range(1, len(rows) + 1),
+    )
+) 
